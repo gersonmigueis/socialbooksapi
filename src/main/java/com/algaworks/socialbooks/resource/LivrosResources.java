@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.algaworks.socialbooks.domain.Livro;
-import com.algaworks.socialbooks.repository.LivrosRepository;
+import com.algaworks.socialbooks.services.LivrosService;
+import com.algaworks.socialbooks.services.exceptions.LivroNaoEncontradoException;
 @RestController
 //apartir dessa URI livros consigo executar qualquer metodo abaixo. 
 @RequestMapping("/livros")
@@ -22,17 +23,17 @@ public class LivrosResources {
 	
 	//Autowired verifica se tem alguam implentação para a interface (LivrosRepository)
 	@Autowired
-	private LivrosRepository livrosRepository;
+	private LivrosService livrosService;
 	
 	@RequestMapping(method = RequestMethod.GET) 
-	public List<Livro> Listar(){
+	public ResponseEntity<List<Livro>> Listar(){
 		//Como se fosse um select lá na tabela livro. Retorna todos os livros
-		return livrosRepository.findAll();
+		return ResponseEntity.status(HttpStatus.OK).body(livrosService.listar());
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<Void> salvar(@RequestBody Livro livro){ //RequestBody : Pega o que esta na requisição e coloca no objeto livro
-	    livro = livrosRepository.save(livro);
+	    livro = livrosService.salvar(livro);
 		
 		URI uri  = ServletUriComponentsBuilder.fromCurrentRequest().
 				path("/{id}").buildAndExpand(livro.getId()).toUri();
@@ -45,9 +46,10 @@ public class LivrosResources {
 	public ResponseEntity<?> buscar (@PathVariable Long id){ //Pego o valor na variavel acima 
 		//Trantando as respostas: ResponseEntity, notação <?> 
 		
-		Livro livro = livrosRepository.findOne(id);
-		
-		if (livro == null){
+		Livro livro = null;
+		try {
+			livro = livrosService.buscar(id);
+		} catch (LivroNaoEncontradoException e) {
 			return ResponseEntity.notFound().build();
 		}
 		
@@ -55,14 +57,25 @@ public class LivrosResources {
 	}
 	
 	@RequestMapping(value="/{id}", method = RequestMethod.DELETE)
-	public void deletear(@PathVariable("id") Long id){
-		livrosRepository.delete(id);	
+	public ResponseEntity<Void> deletear(@PathVariable("id") Long id){
+		try{
+			livrosService.deletar(id);;
+		} catch(LivroNaoEncontradoException e){
+			return ResponseEntity.notFound().build(); //trantando melhor o retorno quando o registro ja foi excluido - Não encontrado
+		}
+			return ResponseEntity.noContent().build(); //não foi encontrado nenhum conteudo
 	}
 	
 	@RequestMapping(value="/{id}", method = RequestMethod.PUT)
-	public void atualizar(@RequestBody Livro livro, @PathVariable("id") Long id){
+	public ResponseEntity<Void> atualizar(@RequestBody Livro livro,
+			@PathVariable("id") Long id){
 		livro.setId(id); //Confirmando o ID que quero atualizar
-		livrosRepository.save(livro);
+		try {
+			livrosService.atualizar(livro);
+		} catch (LivroNaoEncontradoException e) {
+			return ResponseEntity.notFound().build();
+		} 
+		return ResponseEntity.noContent().build(); //não foi encontrado nenhum conteudo
 	}
 }
 
