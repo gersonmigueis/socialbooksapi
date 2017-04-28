@@ -33,7 +33,8 @@ public class LivrosResources {
 	
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> salvar(@RequestBody Livro livro){ //RequestBody : Pega o que esta na requisição e coloca no objeto livro
+	public ResponseEntity<Void> salvar(@RequestBody Livro livro){ 
+		//RequestBody : Pega o que esta na requisição e coloca no objeto livro
 	    livro = livrosService.salvar(livro);
 		
 		URI uri  = ServletUriComponentsBuilder.fromCurrentRequest().
