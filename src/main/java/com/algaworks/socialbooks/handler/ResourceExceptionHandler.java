@@ -2,11 +2,11 @@ package com.algaworks.socialbooks.handler;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
 import com.algaworks.socialbooks.domain.DetalhesErro;
 import com.algaworks.socialbooks.execeptions.AutorExistenteException;
 import com.algaworks.socialbooks.execeptions.AutorNaoEncontradoException;
@@ -54,4 +54,18 @@ public class ResourceExceptionHandler {
 				 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro); 
 	}
+	//Tratando a exceção ao tentar cadastrar o livro com um autor não existente 
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<DetalhesErro> handleDataIntegrityViolationException
+							(DataIntegrityViolationException e, HttpServletRequest request){
+		
+		DetalhesErro erro = new DetalhesErro();
+		erro.setStatus(400l);
+		erro.setTitulo("Requisição invalida");
+		erro.setMensagemDesenvolvedor("http://erros.socialbooks.com/400");
+		erro.setTimestamp(System.currentTimeMillis()); /*Retornando o erro em milisegundos */
+				 //Bad_Request pra dizer hoo que você fez aí não esta muito interessante não. 
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro); 
+	}
+
 }

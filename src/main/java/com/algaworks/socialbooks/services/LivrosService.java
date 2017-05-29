@@ -62,6 +62,7 @@ public class LivrosService {
 		Livro livro = buscar(livroId);
 		
 		comentario.setLivro(livro);
+		//Pegando a data atual ao salvar um comentario
 		comentario.setData(new Date());
 		
 		return comentariosRespository.save(comentario);
