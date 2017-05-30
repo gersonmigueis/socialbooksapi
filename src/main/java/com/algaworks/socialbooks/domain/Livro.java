@@ -10,6 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -27,15 +31,20 @@ public class Livro {
 	private Long id; 
 	
 	@JsonInclude(Include.NON_NULL)
+	@NotEmpty(message = "O campo nome não pode ser vazio.") //NotEmpty o campo não pode ser vazio 
 	private String nome;
 	
 	@JsonInclude(Include.NON_NULL)
 	@JsonFormat(pattern = "dd/MM/yyyy")
+	@NotNull(message = "O campo publicação é de preenchimento obrigatorio.") //NotNull o campo não pode ser nulo
 	private Date publicacao; 
 	
+	@NotNull(message = "O campo editora é de preenchimento obrigatorio.") //NotNull o campo não pode ser nulo
 	@JsonInclude(Include.NON_NULL)
 	private String editora; 
 	
+	@NotNull(message = "O campo resumo deve ser preenchido.") 
+	@Size(max = 1500 ,message = "O resumo não pode conter mais de 1500 caracteres.") //Size - defino o valor maximo de caracteres do campo
 	@JsonInclude(Include.NON_NULL)
 	private String resumo; 
 	

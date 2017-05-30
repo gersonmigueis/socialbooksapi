@@ -9,11 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Comentario {
@@ -22,6 +26,9 @@ public class Comentario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id; 
 	
+	@NotEmpty(message = "O comentario pode ser preenchido.")
+	@Size(max = 1500, message = "O comentario não pode conter mais de 1500 caracteres.")
+	@JsonProperty("comentario") //Se precisar mudar o nome do atributo na minha representação no Json. 
 	private String texto; 
 	
 	@JsonInclude(Include.NON_NULL)
